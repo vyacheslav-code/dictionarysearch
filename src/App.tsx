@@ -1,26 +1,56 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { jsx } from "@emotion/react";
+import { observer } from "mobx-react";
+import { Chart, Interval } from "bizcharts";
 
-function App() {
+import { useStore } from "./store/useStore";
+import Container from "./components/Container";
+import Header from "./components/Header";
+import SearchInput from "./components/SearchInput";
+import SearchTypeSelect from "./components/SearchTypeSelect";
+import SearchButton from "./components/SearchButton";
+import TotalNumber from "./components/TotalNumber";
+import { OPTIONS } from "./constants";
+
+import "./index.css";
+
+const App = () => {
+  const {
+    makeSearch,
+    searchType,
+    searchPhrase,
+    setSearchPhrase,
+    setSearchType,
+    number,
+    loading,
+    chartData,
+  } = useStore();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <Container>
+      <Header />
 
-export default App;
+      <SearchInput
+        onChange={setSearchPhrase}
+        value={searchPhrase}
+        placeholder={"Enter a letter to search for..."}
+      />
+
+      <SearchTypeSelect
+        options={OPTIONS}
+        value={searchType}
+        onChange={setSearchType}
+      />
+
+      <SearchButton onClick={makeSearch}>Search</SearchButton>
+
+      {number && !loading && <TotalNumber>{number}</TotalNumber>}
+      {loading && <p>Loading...</p>}
+
+      <Chart autoFit data={chartData} placeholder={"Loading"}>
+        <Interval position={"letter*total"} />
+      </Chart>
+    </Container>
+  );
+};
+
+export default observer(App);
